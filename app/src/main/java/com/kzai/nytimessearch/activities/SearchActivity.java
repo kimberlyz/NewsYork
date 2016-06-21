@@ -2,6 +2,7 @@ package com.kzai.nytimessearch.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -18,6 +19,8 @@ import android.widget.GridView;
 
 import com.kzai.nytimessearch.Article;
 import com.kzai.nytimessearch.ArticleArrayAdapter;
+import com.kzai.nytimessearch.EndlessScrollListener;
+import com.kzai.nytimessearch.NewsFilterDialogFragment;
 import com.kzai.nytimessearch.R;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -36,6 +39,9 @@ public class SearchActivity extends AppCompatActivity {
     EditText etQuery;
     GridView gvResults;
     Button btnSearch;
+
+    String searchQuery;
+    int pageNum;
 
     ArrayList<Article> articles;
     ArticleArrayAdapter adapter;
@@ -57,6 +63,12 @@ public class SearchActivity extends AppCompatActivity {
         adapter = new ArticleArrayAdapter(this, articles);
         gvResults.setAdapter(adapter);
 
+        pageNum = 0;
+        setupGridViewListeners();
+
+    }
+
+    private void setupGridViewListeners() {
         // hook up listener for grid click
         gvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -70,6 +82,54 @@ public class SearchActivity extends AppCompatActivity {
                 i.putExtra("article", article);
                 // launch activity
                 startActivity(i);
+            }
+        });
+
+        gvResults.setOnScrollListener(new EndlessScrollListener() {
+            @Override
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to your AdapterView
+                pageNum++;
+                customLoadMoreDataFromApi(pageNum);
+                // or customLoadMoreDataFromApi(totalItemsCount);
+                return true; // ONLY if more data is actually being loaded; false otherwise.
+            }
+
+            @Override
+            public int getFooterViewType() {
+                return -1;
+            }
+        });
+    }
+
+    // Append more data into the adapter
+    public void customLoadMoreDataFromApi(int offset) {
+        // This method probably sends out a network request and appends new data items to your adapter.
+        // Use the offset value and add it as a parameter to your API request to retrieve paginated data.
+        // Deserialize API response and then construct new objects to append to the adapter
+        AsyncHttpClient client = new AsyncHttpClient();
+        String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
+
+        RequestParams params = new RequestParams();
+        params.put("api-key", "e273cb22aac54a71820c5acac368a6bf");
+        params.put("page", offset);
+        params.put("q", searchQuery);
+
+        client.get(url, params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Log.d("DEBUG", response.toString());
+                JSONArray articleJsonResults = null;
+
+                try {
+                    articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
+                    //adapter.clear();
+                    adapter.addAll(Article.fromJSONArray(articleJsonResults));
+                    Log.d("DEBUG", articles.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -87,6 +147,7 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // perform query here
+                searchQuery = query;
                 AsyncHttpClient client = new AsyncHttpClient();
                 String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
 
@@ -124,7 +185,7 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
-        searchView.setOnSuggestionListener();
+        //searchView.setOnSuggestionListener();
 
         return super.onCreateOptionsMenu(menu);
         //return true;
@@ -139,6 +200,9 @@ public class SearchActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            FragmentManager fm = getSupportFragmentManager();
+            NewsFilterDialogFragment newsFilterDialogFragment = NewsFilterDialogFragment.newInstance("Advanced Search");
+            newsFilterDialogFragment.show(fm, "fragment_news_filter");
             return true;
         }
 
