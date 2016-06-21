@@ -5,4 +5,9 @@
     <string name="search">Search</string>
     <string name="title_activity_article">ArticleActivity</string>
     <string name="begin_date">Begin Date</string>
+    <string-array name="spinner_array">
+        <item>Newest</item>
+        <item>Oldest</item>
+    </string-array>
+
 </resources>
