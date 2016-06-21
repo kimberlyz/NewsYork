@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.kzai.nytimessearch.Article;
 import com.kzai.nytimessearch.ArticleArrayAdapter;
@@ -30,18 +31,25 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import cz.msebera.android.httpclient.Header;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements NewsFilterDialogFragment.OnCompleteListener {
 
     EditText etQuery;
     GridView gvResults;
     Button btnSearch;
 
+    Calendar calendar;
+    String sort;
+
     String searchQuery;
     int pageNum;
+
+    public static String beginDate;
 
     ArrayList<Article> articles;
     ArticleArrayAdapter adapter;
@@ -56,9 +64,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     public void setupViews() {
-        etQuery = (EditText) findViewById(R.id.etQuery);
         gvResults = (GridView) findViewById(R.id.gvResults);
-        btnSearch = (Button) findViewById(R.id.btnSearch);
         articles = new ArrayList<>();
         adapter = new ArticleArrayAdapter(this, articles);
         gvResults.setAdapter(adapter);
@@ -108,6 +114,7 @@ public class SearchActivity extends AppCompatActivity {
         // This method probably sends out a network request and appends new data items to your adapter.
         // Use the offset value and add it as a parameter to your API request to retrieve paginated data.
         // Deserialize API response and then construct new objects to append to the adapter
+
         AsyncHttpClient client = new AsyncHttpClient();
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
 
@@ -115,6 +122,19 @@ public class SearchActivity extends AppCompatActivity {
         params.put("api-key", "e273cb22aac54a71820c5acac368a6bf");
         params.put("page", offset);
         params.put("q", searchQuery);
+
+        if (calendar != null) {
+            // (2) create a date "formatter" (the date format we want)
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+
+            // (3) create a new String using the date format we want
+            String chosenDateText = formatter.format(calendar.getTime());
+            params.put("begin_date", chosenDateText);
+        }
+
+        if (sort != null) {
+            params.put("sort", sort);
+        }
 
         client.get(url, params, new JsonHttpResponseHandler() {
             @Override
@@ -147,6 +167,7 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // perform query here
+                pageNum = 0;
                 searchQuery = query;
                 AsyncHttpClient client = new AsyncHttpClient();
                 String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
@@ -155,6 +176,19 @@ public class SearchActivity extends AppCompatActivity {
                 params.put("api-key", "e273cb22aac54a71820c5acac368a6bf");
                 params.put("page", 0);
                 params.put("q", query);
+
+                if (calendar != null) {
+                    // (2) create a date "formatter" (the date format we want)
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+
+                    // (3) create a new String using the date format we want
+                    String chosenDateText = formatter.format(calendar.getTime());
+                    params.put("begin_date", chosenDateText);
+                }
+
+                if (sort != null) {
+                    params.put("sort", sort);
+                }
 
                 client.get(url, params, new JsonHttpResponseHandler() {
                     @Override
@@ -170,6 +204,11 @@ public class SearchActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        super.onFailure(statusCode, headers, responseString, throwable);
                     }
                 });
 
@@ -209,32 +248,18 @@ public class SearchActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onArticleSearch(View view) {
-        String query = etQuery.getText().toString();
-        //Toast.makeText(this, "Searching for " + query, Toast.LENGTH_SHORT).show();
-        AsyncHttpClient client = new AsyncHttpClient();
-        String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
+    public void onComplete(Calendar calendar, String sort) {
+        // After the dialog fra
+        // gment completes, it calls this callback.
+        // use the string here
+        if (calendar != null) {
+            this.calendar = calendar;
+        }
 
-        RequestParams params = new RequestParams();
-        params.put("api-key", "e273cb22aac54a71820c5acac368a6bf");
-        params.put("page", 0);
-        params.put("q", query);
+        if (sort != null) {
+            this.sort = sort;
+        }
 
-        client.get(url, params, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.d("DEBUG", response.toString());
-                JSONArray articleJsonResults = null;
-
-                try {
-                    articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
-                    adapter.clear();
-                    adapter.addAll(Article.fromJSONArray(articleJsonResults));
-                    Log.d("DEBUG", articles.toString());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        Toast.makeText(SearchActivity.this, "HI THERE", Toast.LENGTH_SHORT).show();
     }
 }

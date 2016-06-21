@@ -5,9 +5,11 @@
     <string name="search">Search</string>
     <string name="title_activity_article">ArticleActivity</string>
     <string name="begin_date">Begin Date</string>
+    <string name="sort_order">Sort order</string>
     <string-array name="spinner_array">
         <item>Newest</item>
         <item>Oldest</item>
     </string-array>
+    <string name="save">Save</string>
 
 </resources>
