@@ -19,8 +19,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 
 /**
  * Created by kzai on 6/20/16.
@@ -31,7 +31,8 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
     private OnCompleteListener mListener;
     private Calendar chosenCalendar;
     private String sort;
-    private HashMap<String, Boolean> categories = new HashMap<>();
+    //private HashMap<String, Boolean> categories = new HashMap<>();
+    private ArrayList<String> categories;
     
     public NewsFilterDialogFragment() {
         // Empty constructor is required for DialogFragment
@@ -51,6 +52,7 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getDialog().setCanceledOnTouchOutside(false);
+        categories = new ArrayList<>();
         return inflater.inflate(R.layout.fragment_news_filter, container);
     }
 
@@ -66,7 +68,7 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
             public void onClick(View v)
             {
                 // do something
-                mListener.onComplete(chosenCalendar, sort);
+                mListener.onComplete(chosenCalendar, sort, categories);
                 dismiss();
             }
         });
@@ -141,9 +143,8 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
         // TODO Auto-generated method stub
     }
 
-
-    public static interface OnCompleteListener {
-        public abstract void onComplete(Calendar calendar, String sort);
+    public interface OnCompleteListener {
+        void onComplete(Calendar calendar, String sort, ArrayList<String> categories);
     }
 
     // make sure the Activity implemented it
@@ -167,82 +168,83 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
             case R.id.checkbox_art:
                 if (checked) {
                     //params.put()
-                    Toast.makeText(getContext(), "art", Toast.LENGTH_SHORT);
+                    categories.add("Art");
                 }
                 // Put some meat on the sandwich
                 else {
-
+                    categories.remove("Art");
                 }
                 // Remove the meat
                 break;
             case R.id.checkbox_business:
                 if (checked) {
-                    Toast.makeText(getContext(), "business", Toast.LENGTH_SHORT);
+                    categories.add("Business");
                 }
                 // Cheese me
                 else {
-
+                    categories.remove("Business");
                 }
                 // I'm lactose intolerant
                 break;
             case R.id.checkbox_fashion:
                 if (checked) {
                     //params.put()
-                    Toast.makeText(getContext(), "fashion", Toast.LENGTH_SHORT);
+                    categories.add("Fashion");
                 }
                 // Put some meat on the sandwich
                 else {
-
+                    categories.remove("Fashion");
                 }
                 // Remove the meat
                 break;
             case R.id.checkbox_food:
                 if (checked) {
-
+                    categories.add("Food");
                 }
                 // Cheese me
                 else {
-
+                    categories.remove("Food");
                 }
                 // I'm lactose intolerant
                 break;
             case R.id.checkbox_health:
                 if (checked) {
-                    //params.put()
+                    categories.add("Health");
                 }
                 // Put some meat on the sandwich
                 else {
-
+                    categories.remove("Health");
                 }
                 // Remove the meat
                 break;
             case R.id.checkbox_politics:
                 if (checked) {
-
+                    categories.add("Politics");
                 }
                 // Cheese me
                 else {
-
+                    categories.remove("Politics");
                 }
                 // I'm lactose intolerant
                 break;
             case R.id.checkbox_sports:
                 if (checked) {
                     //params.put()
+                    categories.add("Sports");
                 }
                 // Put some meat on the sandwich
                 else {
-
+                    categories.remove("Sports");
                 }
                 // Remove the meat
                 break;
             case R.id.checkbox_travel:
                 if (checked) {
-
+                    categories.add("Travel");
                 }
                 // Cheese me
                 else {
-
+                    categories.remove("Travel");
                 }
                 // I'm lactose intolerant
                 break;

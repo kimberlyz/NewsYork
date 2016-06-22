@@ -16,7 +16,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.kzai.nytimessearch.Article;
 import com.kzai.nytimessearch.ArticleArrayAdapter;
@@ -55,7 +54,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
 
     ArrayList<Article> articles;
     ArticleArrayAdapter adapter;
-    ArrayList<String> params;
+    ArrayList<String> categories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,8 +101,8 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
             public boolean onLoadMore(int page, int totalItemsCount) {
                 // Triggered only when new data needs to be appended to the list
                 // Add whatever code is needed to append new items to your AdapterView
-                pageNum++;
-                customLoadMoreDataFromApi(pageNum);
+                //pageNum++;
+                customLoadMoreDataFromApi(page);
                 // or customLoadMoreDataFromApi(totalItemsCount);
                 return true; // ONLY if more data is actually being loaded; false otherwise.
             }
@@ -142,6 +141,14 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
             params.put("sort", sort);
         }
 
+        if (categories != null) {
+            String combo = "";
+            for (String news_desk_value: categories) {
+                combo += news_desk_value + ",";
+            }
+            params.put("news_desk", combo.substring(combo.length() - 1));
+        }
+
         client.get(url, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -156,6 +163,11 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
             }
         });
     }
@@ -181,6 +193,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
                 RequestParams params = new RequestParams();
                 params.put("api-key", "e273cb22aac54a71820c5acac368a6bf");
                 params.put("page", 0);
+
                 params.put("q", query);
 
                 if (calendar != null) {
@@ -194,6 +207,15 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
 
                 if (sort != null) {
                     params.put("sort", sort);
+                }
+
+                if (categories != null) {
+                    String combo = "";
+                    for (String news_desk_value: categories) {
+                        combo += news_desk_value + ",";
+                    }
+                    combo = combo.substring(0, combo.length() - 1);
+                    params.put("news_desk", combo);
                 }
 
                 client.get(url, params, new JsonHttpResponseHandler() {
@@ -213,8 +235,8 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
                     }
 
                     @Override
-                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                        super.onFailure(statusCode, headers, responseString, throwable);
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
                     }
                 });
 
@@ -252,7 +274,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
         return super.onOptionsItemSelected(item);
     }
 
-    public void onComplete(Calendar calendar, String sort) {
+    public void onComplete(Calendar calendar, String sort, ArrayList<String> categories) {
         // After the dialog fra
         // gment completes, it calls this callback.
         // use the string here
@@ -260,11 +282,13 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
             this.calendar = calendar;
         }
 
-        if (sort != null) {
+        if (!sort.isEmpty()) {
             this.sort = sort;
         }
 
-        Toast.makeText(SearchActivity.this, "HI THERE", Toast.LENGTH_SHORT).show();
+        if (!categories.isEmpty()) {
+            this.categories = categories;
+        }
     }
 
     public void onCheckboxClicked(View view) {
