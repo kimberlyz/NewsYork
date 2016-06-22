@@ -49,10 +49,13 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
     String searchQuery;
     int pageNum;
 
+    FragmentManager fm;
+    NewsFilterDialogFragment newsFilterDialogFragment;
     public static String beginDate;
 
     ArrayList<Article> articles;
     ArticleArrayAdapter adapter;
+    ArrayList<String> params;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +74,9 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
 
         pageNum = 0;
         setupGridViewListeners();
+
+        fm = getSupportFragmentManager();
+        newsFilterDialogFragment = NewsFilterDialogFragment.newInstance("Advanced Search");
 
     }
 
@@ -239,8 +245,6 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            FragmentManager fm = getSupportFragmentManager();
-            NewsFilterDialogFragment newsFilterDialogFragment = NewsFilterDialogFragment.newInstance("Advanced Search");
             newsFilterDialogFragment.show(fm, "fragment_news_filter");
             return true;
         }
@@ -261,5 +265,16 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
         }
 
         Toast.makeText(SearchActivity.this, "HI THERE", Toast.LENGTH_SHORT).show();
+    }
+
+    public void onCheckboxClicked(View view) {
+        newsFilterDialogFragment.onCheckboxClicked(view);
+        // Is the view now checked?
+        /*
+        boolean checked = ((CheckBox) view).isChecked();
+
+        // Check which checkbox was clicked
+
+        } */
     }
 }

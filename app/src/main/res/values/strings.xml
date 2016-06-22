@@ -7,9 +7,19 @@
     <string name="begin_date">Begin Date</string>
     <string name="sort_order">Sort order</string>
     <string-array name="spinner_array">
+        <item></item>
         <item>Newest</item>
         <item>Oldest</item>
     </string-array>
     <string name="save">Save</string>
+    <string name="categories">Categories</string>
+    <string name="categ_art">Art</string>
+    <string name="categ_business">Business</string>
+    <string name="categ_fashion">Fashion</string>
+    <string name="categ_food">Food</string>
+    <string name="categ_health">Health</string>
+    <string name="categ_politics">Politics</string>
+    <string name="categ_sports">Sports</string>
+    <string name="categ_travel">Travel</string>
 
 </resources>

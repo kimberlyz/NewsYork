@@ -12,6 +12,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -19,16 +20,18 @@ import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 
 /**
  * Created by kzai on 6/20/16.
  */
-public class NewsFilterDialogFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener, AdapterView.OnItemSelectedListener {
+public class NewsFilterDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener {
     
     private EditText displayDatePicker;
     private OnCompleteListener mListener;
     private Calendar chosenCalendar;
     private String sort;
+    private HashMap<String, Boolean> categories = new HashMap<>();
     
     public NewsFilterDialogFragment() {
         // Empty constructor is required for DialogFragment
@@ -47,6 +50,7 @@ public class NewsFilterDialogFragment extends DialogFragment implements DatePick
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        getDialog().setCanceledOnTouchOutside(false);
         return inflater.inflate(R.layout.fragment_news_filter, container);
     }
 
@@ -126,22 +130,6 @@ public class NewsFilterDialogFragment extends DialogFragment implements DatePick
         });
     }
 
-    public void showDatePickerDialog(View v) {
-        DatePickerFragment newFragment = new DatePickerFragment();
-        newFragment.show(getFragmentManager(), "datePicker");
-    }
-
-    // handle the date selected
-
-    @Override
-    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        // store the values selected into a Calendar instance
-        final Calendar c = Calendar.getInstance();
-        c.set(Calendar.YEAR, year);
-        c.set(Calendar.MONTH, monthOfYear);
-        c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-    }
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         // On selecting a spinner item
@@ -167,6 +155,97 @@ public class NewsFilterDialogFragment extends DialogFragment implements DatePick
         }
         catch (final ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnCompleteListener");
+        }
+    }
+
+    public void onCheckboxClicked(View view) {
+        // Is the view now checked?
+        boolean checked = ((CheckBox) view).isChecked();
+
+        //Toast.makeText(getContext(), "HAI", Toast.LENGTH_SHORT).show();
+        switch (view.getId()) {
+            case R.id.checkbox_art:
+                if (checked) {
+                    //params.put()
+                    Toast.makeText(getContext(), "art", Toast.LENGTH_SHORT);
+                }
+                // Put some meat on the sandwich
+                else {
+
+                }
+                // Remove the meat
+                break;
+            case R.id.checkbox_business:
+                if (checked) {
+                    Toast.makeText(getContext(), "business", Toast.LENGTH_SHORT);
+                }
+                // Cheese me
+                else {
+
+                }
+                // I'm lactose intolerant
+                break;
+            case R.id.checkbox_fashion:
+                if (checked) {
+                    //params.put()
+                    Toast.makeText(getContext(), "fashion", Toast.LENGTH_SHORT);
+                }
+                // Put some meat on the sandwich
+                else {
+
+                }
+                // Remove the meat
+                break;
+            case R.id.checkbox_food:
+                if (checked) {
+
+                }
+                // Cheese me
+                else {
+
+                }
+                // I'm lactose intolerant
+                break;
+            case R.id.checkbox_health:
+                if (checked) {
+                    //params.put()
+                }
+                // Put some meat on the sandwich
+                else {
+
+                }
+                // Remove the meat
+                break;
+            case R.id.checkbox_politics:
+                if (checked) {
+
+                }
+                // Cheese me
+                else {
+
+                }
+                // I'm lactose intolerant
+                break;
+            case R.id.checkbox_sports:
+                if (checked) {
+                    //params.put()
+                }
+                // Put some meat on the sandwich
+                else {
+
+                }
+                // Remove the meat
+                break;
+            case R.id.checkbox_travel:
+                if (checked) {
+
+                }
+                // Cheese me
+                else {
+
+                }
+                // I'm lactose intolerant
+                break;
         }
     }
 }
