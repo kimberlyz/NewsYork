@@ -11,7 +11,7 @@
         <item>Newest</item>
         <item>Oldest</item>
     </string-array>
-    <string name="save">Save</string>
+    <string name="clear">Clear</string>
     <string name="categories">Categories</string>
     <string name="categ_art">Art</string>
     <string name="categ_business">Business</string>

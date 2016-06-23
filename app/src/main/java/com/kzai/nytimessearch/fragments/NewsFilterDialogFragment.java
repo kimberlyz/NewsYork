@@ -1,10 +1,12 @@
-package com.kzai.nytimessearch;
+package com.kzai.nytimessearch.fragments;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,8 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.kzai.nytimessearch.R;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,8 +35,11 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
     private OnCompleteListener mListener;
     private Calendar chosenCalendar;
     private String sort;
+    private Spinner spinner;
+
     //private HashMap<String, Boolean> categories = new HashMap<>();
     private ArrayList<String> categories;
+    private ArrayList<CheckBox> categoryReferences;
     
     public NewsFilterDialogFragment() {
         // Empty constructor is required for DialogFragment
@@ -51,31 +58,67 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        getDialog().setCanceledOnTouchOutside(false);
-        categories = new ArrayList<>();
+        getDialog().setCanceledOnTouchOutside(true);
         return inflater.inflate(R.layout.fragment_news_filter, container);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        categories = new ArrayList<>();
+        categoryReferences = new ArrayList<>();
+
         setupDatePicker(view);
         setupSpinner(view);
-        Button button = (Button) view.findViewById(R.id.save_button);
+        setupCheckboxes(view);
+
+        Button button = (Button) view.findViewById(R.id.clear_button);
         button.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
+
                 // do something
-                mListener.onComplete(chosenCalendar, sort, categories);
-                dismiss();
+                chosenCalendar = null;
+                sort = "";
+                categories = new ArrayList<>();
+
+                for (CheckBox checkBox: categoryReferences) {
+                    if (checkBox.isChecked()) {
+                        Log.d("DEBUG", String.valueOf(checkBox.isChecked()));
+                        checkBox.toggle();
+                    } else {
+                        // asdfkjlsd
+                        Log.d("DEBUG", String.valueOf(checkBox.isChecked()));
+                    }
+                }
+
+                displayDatePicker.setText("");
+                spinner.setSelection(0);
+
+
+                Toast.makeText(getContext(), "CLEAR!", Toast.LENGTH_SHORT).show();
+                //mListener.onComplete(chosenCalendar, sort, categories);
+                //dismiss();
             }
         });
     }
 
+    private void setupCheckboxes(View v) {
+        categoryReferences.add((CheckBox) v.findViewById(R.id.checkbox_art));
+        categoryReferences.add((CheckBox) v.findViewById(R.id.checkbox_business));
+        categoryReferences.add((CheckBox) v.findViewById(R.id.checkbox_fashion));
+        categoryReferences.add((CheckBox) v.findViewById(R.id.checkbox_food));
+        categoryReferences.add((CheckBox) v.findViewById(R.id.checkbox_health));
+        categoryReferences.add((CheckBox) v.findViewById(R.id.checkbox_politics));
+        categoryReferences.add((CheckBox) v.findViewById(R.id.checkbox_sports));
+        categoryReferences.add((CheckBox) v.findViewById(R.id.checkbox_travel));
+    }
+
     private void setupSpinner(View v) {
-        Spinner spinner = (Spinner) v.findViewById(R.id.spinner);
+        spinner = (Spinner) v.findViewById(R.id.spinner);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.spinner_array, android.R.layout.simple_spinner_item);
@@ -159,94 +202,82 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
         }
     }
 
+    @Override
+    public void onDismiss(final DialogInterface dialog) {
+        mListener.onComplete(chosenCalendar, sort, categories);
+        super.onDismiss(dialog);
+    }
+
     public void onCheckboxClicked(View view) {
         // Is the view now checked?
-        boolean checked = ((CheckBox) view).isChecked();
+        CheckBox checkBox = (CheckBox) view;
+        boolean checked = checkBox.isChecked();
 
         //Toast.makeText(getContext(), "HAI", Toast.LENGTH_SHORT).show();
         switch (view.getId()) {
             case R.id.checkbox_art:
                 if (checked) {
-                    //params.put()
                     categories.add("Art");
                 }
-                // Put some meat on the sandwich
                 else {
                     categories.remove("Art");
                 }
-                // Remove the meat
                 break;
             case R.id.checkbox_business:
                 if (checked) {
                     categories.add("Business");
                 }
-                // Cheese me
                 else {
                     categories.remove("Business");
                 }
-                // I'm lactose intolerant
                 break;
             case R.id.checkbox_fashion:
                 if (checked) {
-                    //params.put()
                     categories.add("Fashion");
                 }
-                // Put some meat on the sandwich
                 else {
                     categories.remove("Fashion");
                 }
-                // Remove the meat
                 break;
             case R.id.checkbox_food:
                 if (checked) {
                     categories.add("Food");
                 }
-                // Cheese me
                 else {
                     categories.remove("Food");
                 }
-                // I'm lactose intolerant
                 break;
             case R.id.checkbox_health:
                 if (checked) {
                     categories.add("Health");
                 }
-                // Put some meat on the sandwich
                 else {
                     categories.remove("Health");
                 }
-                // Remove the meat
                 break;
             case R.id.checkbox_politics:
                 if (checked) {
                     categories.add("Politics");
                 }
-                // Cheese me
                 else {
                     categories.remove("Politics");
                 }
-                // I'm lactose intolerant
                 break;
             case R.id.checkbox_sports:
                 if (checked) {
-                    //params.put()
                     categories.add("Sports");
                 }
-                // Put some meat on the sandwich
                 else {
                     categories.remove("Sports");
                 }
-                // Remove the meat
                 break;
             case R.id.checkbox_travel:
                 if (checked) {
                     categories.add("Travel");
                 }
-                // Cheese me
                 else {
                     categories.remove("Travel");
                 }
-                // I'm lactose intolerant
                 break;
         }
     }

@@ -1,4 +1,4 @@
-package com.kzai.nytimessearch;
+package com.kzai.nytimessearch.fragments;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;

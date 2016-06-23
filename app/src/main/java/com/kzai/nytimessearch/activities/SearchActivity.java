@@ -1,27 +1,25 @@
 package com.kzai.nytimessearch.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.GridView;
 
 import com.kzai.nytimessearch.Article;
-import com.kzai.nytimessearch.ArticleArrayAdapter;
-import com.kzai.nytimessearch.EndlessScrollListener;
-import com.kzai.nytimessearch.NewsFilterDialogFragment;
+import com.kzai.nytimessearch.ArticleAdapter;
+import com.kzai.nytimessearch.EndlessRecyclerViewScrollListener;
 import com.kzai.nytimessearch.R;
+import com.kzai.nytimessearch.fragments.NewsFilterDialogFragment;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -38,23 +36,26 @@ import cz.msebera.android.httpclient.Header;
 
 public class SearchActivity extends AppCompatActivity implements NewsFilterDialogFragment.OnCompleteListener {
 
-    EditText etQuery;
-    GridView gvResults;
-    Button btnSearch;
+    // For displaying the staggered grid view
+    RecyclerView rvArticles;
+    ArrayList<Article> articles;
+    ArticleAdapter adapter;
 
+    // For filters
     Calendar calendar;
     String sort;
+    ArrayList<String> categories;
 
+    // For endless scrolling
     String searchQuery;
     int pageNum;
 
+    // So fragment keeps track of old results
+    // Not a new initialization each time
     FragmentManager fm;
     NewsFilterDialogFragment newsFilterDialogFragment;
-    public static String beginDate;
 
-    ArrayList<Article> articles;
-    ArticleArrayAdapter adapter;
-    ArrayList<String> categories;
+    static String API_KEY = "e273cb22aac54a71820c5acac368a6bf";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,54 +67,42 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
     }
 
     public void setupViews() {
-        gvResults = (GridView) findViewById(R.id.gvResults);
-        articles = new ArrayList<>();
-        adapter = new ArticleArrayAdapter(this, articles);
-        gvResults.setAdapter(adapter);
-
         pageNum = 0;
-        setupGridViewListeners();
 
         fm = getSupportFragmentManager();
         newsFilterDialogFragment = NewsFilterDialogFragment.newInstance("Advanced Search");
 
+        // Lookup the recyclerview in activity layout
+        rvArticles = (RecyclerView) findViewById(R.id.rvArticles);
+
+        // Initialize contacts
+        articles = new ArrayList<>();
+        // Create adapter passing in the sample user data
+        adapter = new ArticleAdapter(this, articles);
+        // Attach the adapter to the recyclerview to populate items
+        rvArticles.setAdapter(adapter);
+        // Set layout manager to position the items
+        rvArticles.setLayoutManager(new LinearLayoutManager(this));
+
+        setupRecyclerView();
+        // That's all!
     }
 
-    private void setupGridViewListeners() {
-        // hook up listener for grid click
-        gvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
+    private void setupRecyclerView() {
+        // Configure the RecyclerView
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        rvArticles.setLayoutManager(staggeredGridLayoutManager);
+        // Add the scroll listener
+        rvArticles.addOnScrollListener(new EndlessRecyclerViewScrollListener(staggeredGridLayoutManager) {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // create an intent to display the article
-                Intent i = new Intent(getApplicationContext(), ArticleActivity.class);
-                // get the article to display
-                Article article = articles.get(position);
-                // pass in that article to intent
-                i.putExtra("article", article);
-                // launch activity
-                startActivity(i);
-            }
-        });
-
-        gvResults.setOnScrollListener(new EndlessScrollListener() {
-            @Override
-            public boolean onLoadMore(int page, int totalItemsCount) {
+            public void onLoadMore(int page, int totalItemsCount) {
                 // Triggered only when new data needs to be appended to the list
-                // Add whatever code is needed to append new items to your AdapterView
-                //pageNum++;
+                // Add whatever code is needed to append new items to the bottom of the list
                 customLoadMoreDataFromApi(page);
-                // or customLoadMoreDataFromApi(totalItemsCount);
-                return true; // ONLY if more data is actually being loaded; false otherwise.
-            }
-
-            @Override
-            public int getFooterViewType() {
-                return -1;
             }
         });
     }
-
     // Append more data into the adapter
     public void customLoadMoreDataFromApi(int offset) {
         // This method probably sends out a network request and appends new data items to your adapter.
@@ -124,7 +113,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
 
         RequestParams params = new RequestParams();
-        params.put("api-key", "e273cb22aac54a71820c5acac368a6bf");
+        params.put("api-key", API_KEY);
         params.put("page", offset);
         params.put("q", searchQuery);
 
@@ -158,7 +147,8 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
                 try {
                     articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
                     //adapter.clear();
-                    adapter.addAll(Article.fromJSONArray(articleJsonResults));
+                    articles.addAll(Article.fromJSONArray(articleJsonResults));
+                    adapter.notifyDataSetChanged();
                     Log.d("DEBUG", articles.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -191,9 +181,8 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
                 String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
 
                 RequestParams params = new RequestParams();
-                params.put("api-key", "e273cb22aac54a71820c5acac368a6bf");
+                params.put("api-key", API_KEY);
                 params.put("page", 0);
-
                 params.put("q", query);
 
                 if (calendar != null) {
@@ -226,8 +215,9 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
 
                         try {
                             articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
-                            adapter.clear();
-                            adapter.addAll(Article.fromJSONArray(articleJsonResults));
+                            articles.clear();
+                            articles.addAll(Article.fromJSONArray(articleJsonResults));
+                            adapter.notifyDataSetChanged();
                             Log.d("DEBUG", articles.toString());
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -275,8 +265,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
     }
 
     public void onComplete(Calendar calendar, String sort, ArrayList<String> categories) {
-        // After the dialog fra
-        // gment completes, it calls this callback.
+        // After the dialog fragment completes, it calls this callback.
         // use the string here
         if (calendar != null) {
             this.calendar = calendar;
