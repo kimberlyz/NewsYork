@@ -1,6 +1,9 @@
 package com.kzai.nytimessearch;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +12,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.kzai.nytimessearch.activities.ArticleActivity;
+
+import org.parceler.Parcels;
 
 import java.util.List;
 import java.util.Random;
@@ -22,7 +28,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
     // Provide a direct reference to each of the views within a data item
     // Used to cache the views within the item layout for fast access
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // Your holder should contain a member variable
         // for any view that will be set as you render a row
         public TextView tvTitle;
@@ -37,15 +43,34 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
             ivImage = (ImageView) itemView.findViewById(R.id.ivImage);
+
+            // Attach a click listener to the entire row view
+            itemView.setOnClickListener(this);
             //messageButton = (Button) itemView.findViewById(R.id.message_button);
+        }
+        // Handles the row being being clicked
+        @Override
+        public void onClick(View view) {
+            int position = getLayoutPosition(); // gets item position
+            Article article = articles.get(position);
+
+            Intent intent = new Intent(context, ArticleActivity.class);
+            intent.putExtra("article", Parcels.wrap(article));
+            context.startActivity(intent);
+            // We can access the data within the views
+            //Toast.makeText(context, article.getHeadline(), Toast.LENGTH_SHORT).show();
         }
     }
 
+
+
     // Store a member variable for the contacts
-    private List<Article> articles;
+    private static List<Article> articles;
     // Store the context for easy access
-    private Context context;
+    private static Context context;
     private int[] androidColors;
+
+    private int defaultColor = Color.parseColor("#FFFFFF");
 
     // Pass in the contact array into the constructor
     public ArticleAdapter(Context context, List<Article> articles) {
@@ -86,8 +111,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
 
         ImageView imageView = viewHolder.ivImage;
+        ColorDrawable drawable = (ColorDrawable) imageView.getBackground();
+
         int randomAndroidColor = androidColors[new Random().nextInt(androidColors.length)];
         imageView.setBackgroundColor(randomAndroidColor);
+
         Glide.with(imageView.getContext())
                 .load(article.getThumbnail())
                 .into(imageView);

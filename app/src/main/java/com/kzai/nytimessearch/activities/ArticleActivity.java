@@ -15,6 +15,8 @@ import android.webkit.WebViewClient;
 import com.kzai.nytimessearch.Article;
 import com.kzai.nytimessearch.R;
 
+import org.parceler.Parcels;
+
 public class ArticleActivity extends AppCompatActivity {
 
     WebView webView;
@@ -26,7 +28,7 @@ public class ArticleActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Article article = (Article) getIntent().getSerializableExtra("article");
+        Article article = Parcels.unwrap(getIntent().getParcelableExtra("article"));
 
         webView = (WebView) findViewById(R.id.wvArticle);
         webView.setWebViewClient(new WebViewClient() {

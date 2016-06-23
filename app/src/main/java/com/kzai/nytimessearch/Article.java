@@ -3,14 +3,15 @@ package com.kzai.nytimessearch;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by kzai on 6/20/16.
  */
-public class Article implements Serializable {
+@Parcel
+public class Article {
 
     public String getWebUrl() {
         return webUrl;
@@ -27,6 +28,10 @@ public class Article implements Serializable {
     String webUrl;
     String headline;
     String thumbnail;
+
+    public Article() {
+
+    }
 
     public Article(JSONObject jsonObject) {
         try {

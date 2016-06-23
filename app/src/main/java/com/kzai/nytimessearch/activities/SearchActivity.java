@@ -286,12 +286,5 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
 
     public void onCheckboxClicked(View view) {
         newsFilterDialogFragment.onCheckboxClicked(view);
-        // Is the view now checked?
-        /*
-        boolean checked = ((CheckBox) view).isChecked();
-
-        // Check which checkbox was clicked
-
-        } */
     }
 }
