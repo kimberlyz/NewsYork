@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by kzai on 6/20/16.
@@ -35,6 +36,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             super(itemView);
 
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
+            ivImage = (ImageView) itemView.findViewById(R.id.ivImage);
             //messageButton = (Button) itemView.findViewById(R.id.message_button);
         }
     }
@@ -43,11 +45,14 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
     private List<Article> articles;
     // Store the context for easy access
     private Context context;
+    private int[] androidColors;
 
     // Pass in the contact array into the constructor
     public ArticleAdapter(Context context, List<Article> articles) {
         this.articles = articles;
         this.context = context;
+
+        androidColors =  context.getResources().getIntArray(R.array.androidcolors);
     }
 
     // Easy access to the context object in the recyclerview
@@ -79,8 +84,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
         TextView textView = viewHolder.tvTitle;
         textView.setText(article.getHeadline());
 
+
         ImageView imageView = viewHolder.ivImage;
-        Glide.with(context)
+        int randomAndroidColor = androidColors[new Random().nextInt(androidColors.length)];
+        imageView.setBackgroundColor(randomAndroidColor);
+        Glide.with(imageView.getContext())
                 .load(article.getThumbnail())
                 .into(imageView);
     }

@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -19,6 +18,7 @@ import com.kzai.nytimessearch.Article;
 import com.kzai.nytimessearch.ArticleAdapter;
 import com.kzai.nytimessearch.EndlessRecyclerViewScrollListener;
 import com.kzai.nytimessearch.R;
+import com.kzai.nytimessearch.SpacesItemDecoration;
 import com.kzai.nytimessearch.fragments.NewsFilterDialogFragment;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -82,7 +82,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
         // Attach the adapter to the recyclerview to populate items
         rvArticles.setAdapter(adapter);
         // Set layout manager to position the items
-        rvArticles.setLayoutManager(new LinearLayoutManager(this));
+        //rvArticles.setLayoutManager(new LinearLayoutManager(this));
 
         setupRecyclerView();
         // That's all!
@@ -93,12 +93,16 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
         // Configure the RecyclerView
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         rvArticles.setLayoutManager(staggeredGridLayoutManager);
+
+        SpacesItemDecoration decoration = new SpacesItemDecoration(16);
+        rvArticles.addItemDecoration(decoration);
         // Add the scroll listener
         rvArticles.addOnScrollListener(new EndlessRecyclerViewScrollListener(staggeredGridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
                 // Triggered only when new data needs to be appended to the list
                 // Add whatever code is needed to append new items to the bottom of the list
+
                 customLoadMoreDataFromApi(page);
             }
         });
@@ -110,7 +114,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
         // Deserialize API response and then construct new objects to append to the adapter
 
         AsyncHttpClient client = new AsyncHttpClient();
-        String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
+        String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json?";
 
         RequestParams params = new RequestParams();
         params.put("api-key", API_KEY);
@@ -178,7 +182,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
                 pageNum = 0;
                 searchQuery = query;
                 AsyncHttpClient client = new AsyncHttpClient();
-                String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
+                String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json?";
 
                 RequestParams params = new RequestParams();
                 params.put("api-key", API_KEY);
