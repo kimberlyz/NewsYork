@@ -2,8 +2,6 @@ package com.kzai.nytimessearch;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +15,6 @@ import com.kzai.nytimessearch.activities.ArticleActivity;
 import org.parceler.Parcels;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by kzai on 6/20/16.
@@ -46,7 +43,6 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
             // Attach a click listener to the entire row view
             itemView.setOnClickListener(this);
-            //messageButton = (Button) itemView.findViewById(R.id.message_button);
         }
         // Handles the row being being clicked
         @Override
@@ -57,27 +53,18 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             Intent intent = new Intent(context, ArticleActivity.class);
             intent.putExtra("article", Parcels.wrap(article));
             context.startActivity(intent);
-            // We can access the data within the views
-            //Toast.makeText(context, article.getHeadline(), Toast.LENGTH_SHORT).show();
         }
     }
-
-
 
     // Store a member variable for the contacts
     private static List<Article> articles;
     // Store the context for easy access
     private static Context context;
-    private int[] androidColors;
-
-    private int defaultColor = Color.parseColor("#FFFFFF");
 
     // Pass in the contact array into the constructor
     public ArticleAdapter(Context context, List<Article> articles) {
         this.articles = articles;
         this.context = context;
-
-        androidColors =  context.getResources().getIntArray(R.array.androidcolors);
     }
 
     // Easy access to the context object in the recyclerview
@@ -109,16 +96,16 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
         TextView textView = viewHolder.tvTitle;
         textView.setText(article.getHeadline());
 
-
         ImageView imageView = viewHolder.ivImage;
-        ColorDrawable drawable = (ColorDrawable) imageView.getBackground();
+        imageView.setImageDrawable(null);
 
-        int randomAndroidColor = androidColors[new Random().nextInt(androidColors.length)];
-        imageView.setBackgroundColor(randomAndroidColor);
-
-        Glide.with(imageView.getContext())
-                .load(article.getThumbnail())
-                .into(imageView);
+        if (article.getThumbnail().isEmpty()) {
+            imageView.setBackgroundColor(article.getBackgroundColor());
+        } else {
+            Glide.with(imageView.getContext())
+                    .load(article.getThumbnail())
+                    .into(imageView);
+        }
     }
 
     // Returns the total count of items in the list

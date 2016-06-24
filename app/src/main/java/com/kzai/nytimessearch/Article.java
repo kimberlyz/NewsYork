@@ -1,11 +1,14 @@
 package com.kzai.nytimessearch;
 
+import android.content.Context;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcel;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by kzai on 6/20/16.
@@ -25,12 +28,23 @@ public class Article {
         return thumbnail;
     }
 
+    public Integer getBackgroundColor() {
+        return backgroundColor;
+    }
+
     String webUrl;
     String headline;
     String thumbnail;
+    static Context context;
+    static int[] androidColors;
+    Integer backgroundColor;
 
     public Article() {
 
+    }
+
+    public static void setContext(Context c) {
+        context = c;
     }
 
     public Article(JSONObject jsonObject) {
@@ -45,6 +59,7 @@ public class Article {
                 this.thumbnail = "http://www.nytimes.com/" + multimediaJson.getString("url");
             } else {
                 this.thumbnail = "";
+                this.backgroundColor = androidColors[new Random().nextInt(androidColors.length)];
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -53,6 +68,7 @@ public class Article {
 
     public static ArrayList<Article> fromJSONArray(JSONArray array) {
         ArrayList<Article> results = new ArrayList<>();
+        androidColors =  context.getResources().getIntArray(R.array.androidcolors);
 
         for (int x = 0; x < array.length(); x++) {
             try {
