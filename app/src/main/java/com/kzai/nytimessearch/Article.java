@@ -59,8 +59,8 @@ public class Article {
                 this.thumbnail = "http://www.nytimes.com/" + multimediaJson.getString("url");
             } else {
                 this.thumbnail = "";
-                this.backgroundColor = androidColors[new Random().nextInt(androidColors.length)];
             }
+            this.backgroundColor = androidColors[new Random().nextInt(androidColors.length)];
         } catch (JSONException e) {
             e.printStackTrace();
         }

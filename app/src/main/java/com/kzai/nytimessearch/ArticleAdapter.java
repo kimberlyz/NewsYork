@@ -98,10 +98,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
         ImageView imageView = viewHolder.ivImage;
         imageView.setImageDrawable(null);
+        imageView.setBackgroundColor(article.getBackgroundColor());
 
-        if (article.getThumbnail().isEmpty()) {
-            imageView.setBackgroundColor(article.getBackgroundColor());
-        } else {
+        if (!article.getThumbnail().isEmpty()) {
             Glide.with(imageView.getContext())
                     .load(article.getThumbnail())
                     .into(imageView);
