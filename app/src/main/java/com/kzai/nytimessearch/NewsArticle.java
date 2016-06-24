@@ -1,25 +1,11 @@
+
 package com.kzai.nytimessearch;
 
-import com.google.gson.annotations.SerializedName;
+import javax.annotation.Generated;
 
-/**
- * Created by kzai on 6/24/16.
- */
+@Generated("org.jsonschema2pojo")
 public class NewsArticle {
 
-    @SerializedName("web_url")
-    String webUrl;
+    public Response response;
 
-    String headline;
-    String thumbnail;
-
-    public String getWebUrl() {
-        return webUrl;
-    }
-    public String getHeadline() {
-        return headline;
-    }
-    public String getThumbnail() {
-        return thumbnail;
-    }
 }
