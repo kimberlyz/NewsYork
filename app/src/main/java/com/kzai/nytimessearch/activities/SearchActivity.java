@@ -86,6 +86,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
         //rvArticles.setLayoutManager(new LinearLayoutManager(this));
 
         setupRecyclerView();
+        loadTopStories();
         // That's all!
     }
 
@@ -108,6 +109,38 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
             }
         });
     }
+
+    private void loadTopStories() {
+        AsyncHttpClient client = new AsyncHttpClient();
+        String url = "https://api.nytimes.com/svc/topstories/v2/home.json";
+
+        RequestParams params = new RequestParams();
+        params.put("api-key", API_KEY);
+        params.put("section", "world");
+        params.put("format", "json");
+
+        client.get(url, params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                //Log.d("DEBUG", response.toString());
+                JSONArray articleJsonResults = null;
+
+                try {
+                    articleJsonResults = response.getJSONArray("results");
+                    articles.clear();
+                    articles.addAll(Article.fromJSONArrayTopStories(articleJsonResults));
+                    adapter.notifyDataSetChanged();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+        });
+    }
     // Append more data into the adapter
     public void customLoadMoreDataFromApi(int offset) {
         // This method probably sends out a network request and appends new data items to your adapter.
@@ -122,26 +155,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
         params.put("page", offset);
         params.put("q", searchQuery);
 
-        if (calendar != null) {
-            // (2) create a date "formatter" (the date format we want)
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
-
-            // (3) create a new String using the date format we want
-            String chosenDateText = formatter.format(calendar.getTime());
-            params.put("begin_date", chosenDateText);
-        }
-
-        if (sort != null) {
-            params.put("sort", sort);
-        }
-
-        if (categories != null) {
-            String combo = "";
-            for (String news_desk_value: categories) {
-                combo += news_desk_value + ",";
-            }
-            params.put("news_desk", combo.substring(combo.length() - 1));
-        }
+        checkForFilters(params);
 
         client.get(url, params, new JsonHttpResponseHandler() {
             @Override
@@ -167,6 +181,30 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
         });
     }
 
+    private void checkForFilters(RequestParams params) {
+        if (calendar != null) {
+            // (2) create a date "formatter" (the date format we want)
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+
+            // (3) create a new String using the date format we want
+            String chosenDateText = formatter.format(calendar.getTime());
+            params.put("begin_date", chosenDateText);
+        }
+
+        if (sort != null) {
+            params.put("sort", sort);
+        }
+
+        if (categories != null) {
+            String combo = "";
+            for (String news_desk_value: categories) {
+                combo += news_desk_value + ",";
+            }
+            params.put("news_desk", combo.substring(combo.length() - 1));
+        }
+
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -190,27 +228,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
                 params.put("page", 0);
                 params.put("q", query);
 
-                if (calendar != null) {
-                    // (2) create a date "formatter" (the date format we want)
-                    SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
-
-                    // (3) create a new String using the date format we want
-                    String chosenDateText = formatter.format(calendar.getTime());
-                    params.put("begin_date", chosenDateText);
-                }
-
-                if (sort != null) {
-                    params.put("sort", sort);
-                }
-
-                if (categories != null) {
-                    String combo = "";
-                    for (String news_desk_value: categories) {
-                        combo += news_desk_value + ",";
-                    }
-                    combo = combo.substring(0, combo.length() - 1);
-                    params.put("news_desk", combo);
-                }
+                checkForFilters(params);
 
                 client.get(url, params, new JsonHttpResponseHandler() {
                     @Override
@@ -287,5 +305,9 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
 
     public void onCheckboxClicked(View view) {
         newsFilterDialogFragment.onCheckboxClicked(view);
+    }
+
+    public void onDisplayDateClick(View view) {
+        newsFilterDialogFragment.showDatePickerDialog(view);
     }
 }

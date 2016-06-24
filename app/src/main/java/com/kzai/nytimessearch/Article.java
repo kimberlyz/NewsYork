@@ -82,4 +82,38 @@ public class Article {
     }
 
 
+    public Article(JSONObject jsonObject, Boolean b) {
+        try {
+            this.webUrl = jsonObject.getString("url");
+            this.headline = jsonObject.getString("title");
+
+            JSONArray multimedia = jsonObject.getJSONArray("multimedia");
+
+            if (multimedia.length() > 0) {
+                JSONObject multimediaJson = multimedia.getJSONObject(0);
+                this.thumbnail = multimediaJson.getString("url");
+            } else {
+                this.thumbnail = "";
+            }
+            this.backgroundColor = androidColors[new Random().nextInt(androidColors.length)];
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ArrayList<Article> fromJSONArrayTopStories(JSONArray array) {
+        ArrayList<Article> results = new ArrayList<>();
+        androidColors =  context.getResources().getIntArray(R.array.androidcolors);
+
+        for (int x = 0; x < array.length(); x++) {
+            try {
+                results.add(new Article(array.getJSONObject(x), true));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return results;
+    }
+
+
 }

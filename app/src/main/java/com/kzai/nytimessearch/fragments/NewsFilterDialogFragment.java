@@ -29,7 +29,7 @@ import java.util.Calendar;
 /**
  * Created by kzai on 6/20/16.
  */
-public class NewsFilterDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener {
+public class NewsFilterDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener, DatePickerDialog.OnDateSetListener {
     
     private EditText displayDatePicker;
     private OnCompleteListener mListener;
@@ -133,16 +133,10 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
 
     private void setupDatePicker(View v) {
         displayDatePicker = (EditText) v.findViewById(R.id.display_datepicker);
-        // Fetch arguments from bundle and set title
-        String title = getArguments().getString("title", "Enter Name");
-        getDialog().setTitle(title);
         // Show soft keyboard automatically and request focus to field
         displayDatePicker.requestFocus();
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
-
-        //displayDatePicker = (EditText) getView().findViewById(R.id.display_datepicker);
-        //displayDatePicker = (EditText) getView().findViewById(R.id.display_datepicker);
         displayDatePicker.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -157,7 +151,7 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
                 DatePickerDialog mDatePicker = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
                     public void onDateSet(DatePicker datepicker, int selectedyear, int selectedmonth, int selectedday) {
                         // TODO Auto-generated method stub
-                            /*      Your code   to get date and time    */
+                            /*      Your code   to get date and time */
                         chosenCalendar = Calendar.getInstance();
                         chosenCalendar.set(selectedyear, selectedmonth, selectedday);
 
@@ -206,6 +200,24 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
     public void onDismiss(final DialogInterface dialog) {
         mListener.onComplete(chosenCalendar, sort, categories);
         super.onDismiss(dialog);
+    }
+
+    // DatePickerDialog Methods
+    // handle the date selected
+    @Override
+    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+        // store the values selected into a Calendar instance
+        final Calendar c = Calendar.getInstance();
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.MONTH, monthOfYear);
+        c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+    }
+
+    // attach to an onclick handler to show the date picker
+    public void showDatePickerDialog(View v) {
+        DatePickerFragment newFragment = new DatePickerFragment();
+        newFragment.setTargetFragment(NewsFilterDialogFragment.this, 300);
+        newFragment.show(getFragmentManager(), "datePicker");
     }
 
     public void onCheckboxClicked(View view) {

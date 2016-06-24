@@ -12,7 +12,6 @@ import java.util.Calendar;
  */
 public class DatePickerFragment extends DialogFragment {
     @Override
-
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         // Use the current time as the default values for the picker
@@ -26,6 +25,22 @@ public class DatePickerFragment extends DialogFragment {
 
         // Create a new instance of TimePickerDialog and return it
         return new DatePickerDialog(getActivity(), listener, year, month, day);
-
     }
+
+    /*
+    // Defines the listener interface
+    public interface DatePickerDialogListener {
+        void onFinishDatePickerDialog(String inputText);
+    }
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        // Notice the use of `getTargetFragment` which will be set when the dialog is displayed
+        DatePickerDialogListener listener = (DatePickerDialogListener) getTargetFragment();
+
+        listener.onFinishDatePickerDialog();
+        //listener.onFinishDatePickerDialog(mEditText.getText().toString());
+
+        dismiss();
+        super.onDismiss(dialog);
+    } */
 }
