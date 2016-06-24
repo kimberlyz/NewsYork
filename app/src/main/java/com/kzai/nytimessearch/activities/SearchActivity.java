@@ -32,12 +32,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 
 public class SearchActivity extends AppCompatActivity implements NewsFilterDialogFragment.OnCompleteListener {
 
     // For displaying the staggered grid view
-    RecyclerView rvArticles;
+    @BindView(R.id.rvArticles) RecyclerView rvArticles;
     ArrayList<Article> articles;
     ArticleAdapter adapter;
 
@@ -61,6 +63,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+        ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         Article.setContext(this);
         setSupportActionBar(toolbar);
@@ -73,14 +76,11 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
         fm = getSupportFragmentManager();
         newsFilterDialogFragment = NewsFilterDialogFragment.newInstance("Advanced Search");
 
-        // Lookup the recyclerview in activity layout
-        rvArticles = (RecyclerView) findViewById(R.id.rvArticles);
-
         // Initialize contacts
         articles = new ArrayList<>();
         // Create adapter passing in the sample user data
         adapter = new ArticleAdapter(this, articles);
-        // Attach the adapter to the recyclerview to populate items
+        // Attach the adapter to the recyclerview to populate item
         rvArticles.setAdapter(adapter);
         // Set layout manager to position the items
         //rvArticles.setLayoutManager(new LinearLayoutManager(this));

@@ -17,20 +17,24 @@ import com.kzai.nytimessearch.R;
 
 import org.parceler.Parcels;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class ArticleActivity extends AppCompatActivity {
 
-    WebView webView;
+    @BindView(R.id.wvArticle) WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
+        ButterKnife.bind(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         Article article = Parcels.unwrap(getIntent().getParcelableExtra("article"));
 
-        webView = (WebView) findViewById(R.id.wvArticle);
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {

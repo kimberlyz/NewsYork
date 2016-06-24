@@ -16,6 +16,9 @@ import org.parceler.Parcels;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by kzai on 6/20/16.
  */
@@ -28,8 +31,8 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // Your holder should contain a member variable
         // for any view that will be set as you render a row
-        public TextView tvTitle;
-        public ImageView ivImage;
+        public @BindView(R.id.tvTitle) TextView tvTitle;
+        public @BindView(R.id.ivImage) ImageView ivImage;
 
         // We also create a constructor that accepts the entire item row
         // and does the view lookups to find each subview
@@ -38,9 +41,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             // to access the context from any ViewHolder instance.
             super(itemView);
 
-            tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
-            ivImage = (ImageView) itemView.findViewById(R.id.ivImage);
-
+            ButterKnife.bind(this, itemView);
             // Attach a click listener to the entire row view
             itemView.setOnClickListener(this);
         }

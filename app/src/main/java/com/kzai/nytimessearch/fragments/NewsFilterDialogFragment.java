@@ -18,7 +18,6 @@ import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.kzai.nytimessearch.R;
 
@@ -26,16 +25,20 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
  * Created by kzai on 6/20/16.
  */
 public class NewsFilterDialogFragment extends DialogFragment implements AdapterView.OnItemSelectedListener, DatePickerDialog.OnDateSetListener {
     
-    private EditText displayDatePicker;
+    @BindView(R.id.display_datepicker) EditText displayDatePicker;
     private OnCompleteListener mListener;
     private Calendar chosenCalendar;
     private String sort;
-    private Spinner spinner;
+    @BindView(R.id.spinner) Spinner spinner;
 
     //private HashMap<String, Boolean> categories = new HashMap<>();
     private ArrayList<String> categories;
@@ -60,7 +63,9 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getDialog().setCanceledOnTouchOutside(true);
         getDialog().setTitle("Advanced Search");
-        return inflater.inflate(R.layout.fragment_news_filter, container);
+        View view = inflater.inflate(R.layout.fragment_news_filter, container);
+        ButterKnife.bind(this, view);
+        return view;
     }
 
     @Override
@@ -75,36 +80,27 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
         setupCheckboxes(view);
 
         Button button = (Button) view.findViewById(R.id.clear_button);
-        button.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
+    }
 
-                // do something
-                chosenCalendar = null;
-                sort = "";
-                categories = new ArrayList<>();
+    @OnClick(R.id.clear_button)
+    public void clearFilters() {
+        // do something
+        chosenCalendar = null;
+        sort = "";
+        categories = new ArrayList<>();
 
-                for (CheckBox checkBox: categoryReferences) {
-                    if (checkBox.isChecked()) {
-                        Log.d("DEBUG", String.valueOf(checkBox.isChecked()));
-                        checkBox.toggle();
-                    } else {
-                        // asdfkjlsd
-                        Log.d("DEBUG", String.valueOf(checkBox.isChecked()));
-                    }
-                }
-
-                displayDatePicker.setText("");
-                spinner.setSelection(0);
-
-
-                Toast.makeText(getContext(), "CLEAR!", Toast.LENGTH_SHORT).show();
-                //mListener.onComplete(chosenCalendar, sort, categories);
-                //dismiss();
+        for (CheckBox checkBox: categoryReferences) {
+            if (checkBox.isChecked()) {
+                Log.d("DEBUG", String.valueOf(checkBox.isChecked()));
+                checkBox.toggle();
+            } else {
+                // asdfkjlsd
+                Log.d("DEBUG", String.valueOf(checkBox.isChecked()));
             }
-        });
+        }
+
+        displayDatePicker.setText("");
+        spinner.setSelection(0);
     }
 
     private void setupCheckboxes(View v) {
@@ -119,7 +115,6 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
     }
 
     private void setupSpinner(View v) {
-        spinner = (Spinner) v.findViewById(R.id.spinner);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.spinner_array, android.R.layout.simple_spinner_item);
@@ -133,49 +128,43 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
     }
 
     private void setupDatePicker(View v) {
-        displayDatePicker = (EditText) v.findViewById(R.id.display_datepicker);
         // Show soft keyboard automatically and request focus to field
         displayDatePicker.requestFocus();
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+    }
 
-        displayDatePicker.setOnClickListener(new View.OnClickListener() {
+    @OnClick(R.id.display_datepicker)
+    public void displayDate() {
+        //button.setText("Hello!");
+        Calendar mcurrentDate = Calendar.getInstance();
+        int year = mcurrentDate.get(Calendar.YEAR);
+        int month = mcurrentDate.get(Calendar.MONTH);
+        int day = mcurrentDate.get(Calendar.DAY_OF_MONTH);
 
-            @Override
-            public void onClick(View v) {
+        DatePickerDialog mDatePicker = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+            public void onDateSet(DatePicker datepicker, int selectedyear, int selectedmonth, int selectedday) {
                 // TODO Auto-generated method stub
-                //To show current date in the datepicker
-                Calendar mcurrentDate = Calendar.getInstance();
-                int year = mcurrentDate.get(Calendar.YEAR);
-                int month = mcurrentDate.get(Calendar.MONTH);
-                int day = mcurrentDate.get(Calendar.DAY_OF_MONTH);
-
-                DatePickerDialog mDatePicker = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
-                    public void onDateSet(DatePicker datepicker, int selectedyear, int selectedmonth, int selectedday) {
-                        // TODO Auto-generated method stub
                             /*      Your code   to get date and time */
-                        chosenCalendar = Calendar.getInstance();
-                        chosenCalendar.set(selectedyear, selectedmonth, selectedday);
+                chosenCalendar = Calendar.getInstance();
+                chosenCalendar.set(selectedyear, selectedmonth, selectedday);
 
-                        // (2) create a date "formatter" (the date format we want)
-                        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+                // (2) create a date "formatter" (the date format we want)
+                SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
 
-                        // (3) create a new String using the date format we want
-                        String chosenDateText = formatter.format(chosenCalendar.getTime());
-                        displayDatePicker.setText(chosenDateText);
-                    }
-                },year, month, day);
-                mDatePicker.getDatePicker().setCalendarViewShown(false);
-                mDatePicker.setTitle("Select date");
-                mDatePicker.show();  }
-        });
+                // (3) create a new String using the date format we want
+                String chosenDateText = formatter.format(chosenCalendar.getTime());
+                displayDatePicker.setText(chosenDateText);
+            }
+        },year, month, day);
+        mDatePicker.getDatePicker().setCalendarViewShown(false);
+        mDatePicker.setTitle("Select date");
+        mDatePicker.show();
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         // On selecting a spinner item
         sort = parent.getItemAtPosition(position).toString();
-        // Showing selected spinner item
-        Toast.makeText(parent.getContext(), "Selected: " + sort, Toast.LENGTH_LONG).show();
     }
     public void onNothingSelected(AdapterView<?> arg0) {
         // TODO Auto-generated method stub
