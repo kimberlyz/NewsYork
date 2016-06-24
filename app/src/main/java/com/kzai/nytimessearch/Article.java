@@ -88,8 +88,12 @@ public class Article {
             this.headline = jsonObject.getString("title");
 
             JSONArray multimedia = jsonObject.getJSONArray("multimedia");
+            Integer multimediaLength = multimedia.length();
 
-            if (multimedia.length() > 0) {
+            if (multimediaLength > 1) {
+                JSONObject multimediaJson = multimedia.getJSONObject(1);
+                this.thumbnail = multimediaJson.getString("url");
+            } else if (multimediaLength > 0) {
                 JSONObject multimediaJson = multimedia.getJSONObject(0);
                 this.thumbnail = multimediaJson.getString("url");
             } else {

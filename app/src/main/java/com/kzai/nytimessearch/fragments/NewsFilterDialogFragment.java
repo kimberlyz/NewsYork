@@ -59,6 +59,7 @@ public class NewsFilterDialogFragment extends DialogFragment implements AdapterV
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getDialog().setCanceledOnTouchOutside(true);
+        getDialog().setTitle("Advanced Search");
         return inflater.inflate(R.layout.fragment_news_filter, container);
     }
 

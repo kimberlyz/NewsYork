@@ -279,7 +279,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_filter) {
             newsFilterDialogFragment.show(fm, "fragment_news_filter");
             return true;
         }
