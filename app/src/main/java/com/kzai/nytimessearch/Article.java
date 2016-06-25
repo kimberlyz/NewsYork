@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.parceler.Parcel;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -15,6 +16,13 @@ import java.util.Random;
  */
 @Parcel
 public class Article {
+
+    String webUrl;
+    String headline;
+    String thumbnail;
+    static Context context;
+    static int[] androidColors;
+    Integer backgroundColor;
 
     public String getWebUrl() {
         return webUrl;
@@ -32,54 +40,39 @@ public class Article {
         return backgroundColor;
     }
 
-    String webUrl;
-    String headline;
-    String thumbnail;
-    static Context context;
-    static int[] androidColors;
-    Integer backgroundColor;
+    public static void setContext(Context c) {
+        context = c;
+    }
 
     public Article() {
 
     }
 
-    public static void setContext(Context c) {
-        context = c;
-    }
+    public Article(Doc doc) {
+        this.webUrl = doc.getWebUrl();
+        this.headline = doc.getHeadline().getMain();
 
-    public Article(JSONObject jsonObject) {
-        try {
-            this.webUrl = jsonObject.getString("web_url");
-            this.headline = jsonObject.getJSONObject("headline").getString("main");
+        List<Multimedium> multimedia = doc.getMultimedia();
 
-            JSONArray multimedia = jsonObject.getJSONArray("multimedia");
-
-            if (multimedia.length() > 0) {
-                JSONObject multimediaJson = multimedia.getJSONObject(0);
-                this.thumbnail = "http://www.nytimes.com/" + multimediaJson.getString("url");
-            } else {
-                this.thumbnail = "";
-            }
-            this.backgroundColor = androidColors[new Random().nextInt(androidColors.length)];
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (multimedia.size() > 0) {
+            this.thumbnail = doc.getMultimedia().get(0).getUrl();
+        } else {
+            this.thumbnail = "";
         }
+        this.backgroundColor = androidColors[new Random().nextInt(androidColors.length)];
     }
 
-    public static ArrayList<Article> fromJSONArray(JSONArray array) {
+    public static ArrayList<Article> fromNewsArticles(NewsArticle newsArticle) {
         ArrayList<Article> results = new ArrayList<>();
+
         androidColors =  context.getResources().getIntArray(R.array.androidcolors);
 
-        for (int x = 0; x < array.length(); x++) {
-            try {
-                results.add(new Article(array.getJSONObject(x)));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        for (Doc doc: newsArticle.getResponse().getDocs()) {
+            results.add(new Article(doc));
         }
-
         return results;
     }
+
 
 
     public Article(JSONObject jsonObject, Boolean b) {

@@ -17,12 +17,14 @@ import android.view.View;
 import com.kzai.nytimessearch.Article;
 import com.kzai.nytimessearch.ArticleAdapter;
 import com.kzai.nytimessearch.EndlessRecyclerViewScrollListener;
+import com.kzai.nytimessearch.NewsArticle;
 import com.kzai.nytimessearch.R;
 import com.kzai.nytimessearch.SpacesItemDecoration;
 import com.kzai.nytimessearch.fragments.NewsFilterDialogFragment;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.TextHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,6 +43,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
     // For displaying the staggered grid view
     @BindView(R.id.rvArticles) RecyclerView rvArticles;
     ArrayList<Article> articles;
+    //ArrayList<SearchArticle> searchArticles;
     ArticleAdapter adapter;
 
     // For filters
@@ -146,7 +149,6 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
         // This method probably sends out a network request and appends new data items to your adapter.
         // Use the offset value and add it as a parameter to your API request to retrieve paginated data.
         // Deserialize API response and then construct new objects to append to the adapter
-
         AsyncHttpClient client = new AsyncHttpClient();
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json?";
 
@@ -157,6 +159,26 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
 
         checkForFilters(params);
 
+        client.get(url, params, new TextHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                NewsArticle response = NewsArticle.parseJSON(responseString);
+
+                articles.addAll(Article.fromNewsArticles(response));
+                adapter.notifyDataSetChanged();
+                //Gson gson = new GsonBuilder().create();
+                // Define Response class to correspond to the JSON response returned
+                //gson.fromJson(responseString, Response.class);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.d("DEBUG", "Failed GSON");
+            }
+        });
+
+        /*
         client.get(url, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -178,7 +200,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
-        });
+        }); */
     }
 
     private void checkForFilters(RequestParams params) {
@@ -230,6 +252,27 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
 
                 checkForFilters(params);
 
+                client.get(url, params, new TextHttpResponseHandler() {
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                        NewsArticle response = NewsArticle.parseJSON(responseString);
+
+                        articles.clear();
+                        articles.addAll(Article.fromNewsArticles(response));
+                        adapter.notifyDataSetChanged();
+                        //Gson gson = new GsonBuilder().create();
+                    // Define Response class to correspond to the JSON response returned
+                        //gson.fromJson(responseString, Response.class);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        Log.d("DEBUG", "Failed GSON");
+                    }
+                });
+
+                /*
                 client.get(url, params, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -251,7 +294,7 @@ public class SearchActivity extends AppCompatActivity implements NewsFilterDialo
                     public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                         super.onFailure(statusCode, headers, throwable, errorResponse);
                     }
-                });
+                });  */
 
                 // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
                 // see https://code.google.com/p/android/issues/detail?id=24599
