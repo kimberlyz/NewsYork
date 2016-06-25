@@ -48,14 +48,14 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
-Describe any challenges encountered while building the app.
+Implementing the filter in a dialog fragment was difficult. It was challenging to figure out how to send data from a fragment back to another fragment or activity.
 
 ## Open-source libraries used
 
 - [Android Async HTTP](https://github.com/loopj/android-async-http) - Simple asynchronous HTTP requests with JSON parsing
 - [Picasso](http://square.github.io/picasso/) - Image loading and caching library for Android
 - [Butterknife](https://github.com/JakeWharton/butterknife) - Bind Android views and callbacks to fields and methods
-- [GSON](https://github.com/google/gson)- A Java serialization/deserialization library that can convert Java Objects into JSON and back.
+- [GSON](https://github.com/google/gson) - A Java serialization/deserialization library that can convert Java Objects into JSON and back.
 
 ## License
 
