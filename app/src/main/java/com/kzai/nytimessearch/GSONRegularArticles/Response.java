@@ -1,5 +1,5 @@
 
-package com.kzai.nytimessearch;
+package com.kzai.nytimessearch.GSONRegularArticles;
 
 import java.util.ArrayList;
 import java.util.List;

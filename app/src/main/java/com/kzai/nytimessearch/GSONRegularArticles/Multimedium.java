@@ -1,5 +1,4 @@
-
-package com.kzai.nytimessearch;
+package com.kzai.nytimessearch.GSONRegularArticles;
 
 public class Multimedium {
     public String url;

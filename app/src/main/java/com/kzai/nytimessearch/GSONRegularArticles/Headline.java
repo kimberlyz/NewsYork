@@ -1,5 +1,5 @@
 
-package com.kzai.nytimessearch;
+package com.kzai.nytimessearch.GSONRegularArticles;
 
 public class Headline {
     public String main;

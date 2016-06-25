@@ -1,5 +1,5 @@
 
-package com.kzai.nytimessearch;
+package com.kzai.nytimessearch.GSONRegularArticles;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
